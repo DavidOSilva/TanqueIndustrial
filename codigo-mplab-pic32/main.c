@@ -1,10 +1,9 @@
 /*
  * ENGG53 - LABORATÓRIO INTEGRADO II
- * Integrantes: David Oliveira, David Ferrari, André Lino e Caio.
+ * Integrantes: David Oliveira, David Ferrari, André Lino e Caio Sousa Mendes.
  * File:   main.c
  *
  */
-
 
 //NOME LCD: TFT_TM022HDH26 ILI9341
 
@@ -29,13 +28,11 @@
 #define SYS_FREQ 80000000L // Defina o clock do sistema para 80 MHz
 
 // Definindo os sensores e o alarme nos pinos RF0, RF1 e RF2.
-#define BOTAO_ALARME PORTBbits.RB0
-#define SENSOR1      PORTBbits.RB1
-#define SENSOR2      PORTBbits.RB2
-#define SENSOR_ADC   PORTBbits.RB6
+#define BOTAO_ALARME PORTAbits.RA5
+#define SENSOR1      PORTAbits.RA6
+#define SENSOR2      PORTAbits.RA9
  
-#define SHORT_DELAY (50*8)
-#define LONG_DELAY	(500*8)
+#define SHORT_DELAY (100)
 #define VOLTAGE_THRESHOLD 512         // Limite de tensão para acionar o LED2 e o buzzer
 
 volatile unsigned int adc_value = 0;
@@ -78,62 +75,48 @@ main(void) {
     DDPCONbits.JTAGEN = 0;
     TRISA = 11110000;    TRISB = 1;
     T1CON = 0x8030; // TMR1 on, prescale 1:256 PB
-    LATAbits.LATA0 = 0;
-    LATAbits.LATA1 = 0;
-    LATAbits.LATA2 = 0;
-    LATAbits.LATA3 = 0;
-    int voltagemLimite = 500;
+    BUZZER = 0;
+    LED1 = 0;
+    LED2 = 0;
+    LED3 = 0;
     
     while(1) {
       
         
-        if(PORTAbits.RA7 == 0 && sensorAtivo2 == 0) {
+        if(SENSOR2 == 0 && sensorAtivo2 == 0) {
             
-            LATAbits.LATA2 = 1;
+            LED2 = 1;
             BUZZER = 1;
-            TMR1 = 0;
             sensorAtivo2 = 1;
-            while ( TMR1 < LONG_DELAY)
-            {
-            }
+            delayMs(SHORT_DELAY);
+            while(SENSOR2 == 0){}
         }
         
-        if(PORTAbits.RA7 == 0 && sensorAtivo2 == 1){
-            LATAbits.LATA2 = 0;
-            TMR1 = 0;
+        if(SENSOR2 == 0 && sensorAtivo2 == 1){
+            LED2 = 0;
             BUZZER = 0;
             sensorAtivo2 = 0;
-            while ( TMR1 < LONG_DELAY)
-            {
-            }
+            delayMs(SHORT_DELAY);
+            while(SENSOR2 == 0){}
         }
-      if(PORTAbits.RA6 == 0 && sensorAtivo1 == 0) {
+      if(SENSOR1 == 0 && sensorAtivo1 == 0) {
             
-            LATAbits.LATA1 = 1;
+            LED1 = 1;
             BUZZER = 1;
-            TMR1 = 0;
             sensorAtivo1 = 1;
-            while ( TMR1 < LONG_DELAY)
-            {
-            }
+            delayMs(SHORT_DELAY);
+            while(SENSOR1 == 0){}
         }
         
-        if(PORTAbits.RA6 == 0 && sensorAtivo1 == 1){
-            LATAbits.LATA1 = 0;
-            TMR1 = 0;
+        if(SENSOR1 == 0 && sensorAtivo1 == 1){
+            LED1 = 0;
             BUZZER = 0;
             sensorAtivo1 = 0;
-            while ( TMR1 < LONG_DELAY)
-            {
-            }
+            delayMs(SHORT_DELAY);
+            while(SENSOR1 == 0){}
         }
-        if(PORTAbits.RA5 == 0) {
-            
+        if(BOTAO_ALARME == 0) {
             BUZZER = 0;
-//            TMR1 = 0;
-//            while ( TMR1 < LONG_DELAY)
-//            {
-//            }
         }
          // Iniciar a amostragem e conversão do ADC
         AD1CON1bits.SAMP = 1;  // Iniciar amostragem
